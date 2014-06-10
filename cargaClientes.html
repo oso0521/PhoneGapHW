@@ -1,0 +1,88 @@
+<!DOCTYPE html> 
+<html>
+	<head>
+        <meta charset="utf-8">
+        <title>Dulceria Bombon</title>
+        <link rel="stylesheet" href="jquery-mobile/jquery.mobile-1.4.2.min.css">	
+	<link rel="shortcut icon" href="../favicon.ico">
+	<script src="jquery-mobile/jquery.js"></script>
+	<script src="js/index.js"></script>
+	<script src="jquery-mobile/jquery.mobile-1.4.2.min.js"></script>
+        <script>
+			$(this).ajaxSend(function(event, request, settings){
+				//window.location.hash="top";
+				/*if ( settings.url != "responses/tooltipAbonos.php") 
+				{
+					$("#dialogo").html("<img src='img/load.gif' />");
+					$("#dialogo").dialog({
+						modal:true
+					});		
+				}		*/	
+				
+				$("#pop").popup("open");		
+			});
+			
+			$(this).ajaxComplete(function(){
+				//window.location.hash="top";
+				/*$("#dialogo").html("");
+				if($('#dialogo').is('.ui-dialog-content')){
+					$("#dialogo").dialog("close");	
+					$("#dialogo").dialog("destroy");
+				}*/
+				$("#pop").popup("close");
+			});
+			
+			$(this).ajaxError(function(event, request, settings){
+				/*if($){
+					//alert("Estamos fuera de linea");
+					var currentdate = new Date(); 
+					var datetime = "Last Sync: " + currentdate.getDate() + "/"
+									+ (currentdate.getMonth()+1)  + "/" 
+									+ currentdate.getFullYear() + " @ "  
+									+ currentdate.getHours() + ":"  
+									+ currentdate.getMinutes() + ":" 
+									+ currentdate.getSeconds();
+					var localItem = localStorage.getItem("status");
+					if(localItem=="")
+					var myJson = JSON.parse(localItem);
+					window.localStorage.setItem("status", "Ocurrio una perdida de conexion en "+datetime);
+				}
+				$("#dialog").html("<div style=\"font-size:25px;\"><img src=\"img/error.png\"/><div >Error al solicitar la pagina " + settings.url + " verifique su conexion a internet e intentelo de nuevo</div></div>");
+				$("#dialog").dialog({
+					modal:true,
+					width:$(window).width()	* 0.85,
+					title: "Ocurrio algo inesperado",
+					height:$(window).height()	* 0.85
+				}).dialog("open");	*/
+				$("#pop").html("ERROR");
+				//$("#pop").popup("close");
+			});
+		</script>
+        <script>
+			var BASE_JSON={"clientes": [{}], "productos":[{}]};
+			$.getJSON( "http://dulceriabombon.movitbe.com/getClientes.php", function( data ) {
+			  //console.log(data['Clientes']);
+			  BASE_JSON['clientes'] = data['Clientes'];
+			  console.log(BASE_JSON);
+			 /* var items = [];
+			  $.each( data['Clientes'], function( key, val ) {
+				 $.each(val,function(keyP,valP){
+					 console.log(keyP+ " - "+valP);					
+				 });
+			  });*/
+			 			  
+			});
+		</script>
+    </head>
+    <body>
+    	<ul>
+        	
+        </ul>
+        <div id="pop">
+        	Cargando datos, por favor espere.
+        </div>
+        <script>
+			$("#pop").popup({"shadow":true,"theme":"a","corners":true,"overlayTheme": "b"});
+		</script>
+    </body>
+</html>
