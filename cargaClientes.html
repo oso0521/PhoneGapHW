@@ -61,15 +61,10 @@
         <script>
 			var BASE_JSON={"clientes": [{}], "productos":[{}]};
 			$.getJSON( "http://dulceriabombon.movitbe.com/getClientes.php", function( data ) {
-			  //console.log(data['Clientes']);
-			  BASE_JSON['clientes'] = data['Clientes'];
-			  console.log(BASE_JSON);
-			 var items = [];
-			  $.each( data['Clientes'], function( key, val ) {
-				 $.each(val,function(keyP,valP){
-					 $("ul").append("<li>"+keyP+ " - "+valP+"</li>");					
-				 });
-			  });
+			 //console.log(data['Clientes']);
+			 BASE_JSON['clientes'] = data['Clientes'];
+			 console.log(BASE_JSON);
+			 window.localStorage.setItem("BD",JSON.stringify(BASE_JSON) );
 			 			  
 			});
 		</script>

@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Multi-page template</title>
+	<title>Dulcer&iacute;a Bomb&oacute;n Pto. Es.</title>
 	<link rel="stylesheet" href="jquery-mobile/jquery.mobile-1.4.2.min.css">
 	
 	<link rel="shortcut icon" href="../favicon.ico">
@@ -18,15 +18,15 @@
 <!-- Start of first page: #one -->
 <div data-role="page" id="one">
 
-	<div data-role="header">
-		<h1>Multi-page</h1>
+	<div data-role="header" data-theme="b">
+		<h1>Dulcer&iacute;a Bomb&oacute;n Pto. Es.</h1>
 	</div><!-- /header -->
 
 	<div role="main" class="ui-content" >
-		<h2>One</h2>
+		<h2>Seleccione una opci&oacute;n:</h2>
 
-		<p>I have an <code>id</code> of "one" on my page container. I'm first in the source order so I'm shown when the page loads.</p>
-		<div id="pop">
+		
+		<!--<div id="pop">
         	<p>
             	My popUp
              </p>
@@ -37,36 +37,79 @@
         <a href="cargaClientes.html">
         	Carga Clientes
         </a>
-		<p>This is a multi-page boilerplate template that you can copy to build your first jQuery Mobile page. This template contains multiple "page" containers inside, unlike a single page template that has just one page within it.</p>
-		<p>Just view the source and copy the code to get started. All the CSS and JS is linked to the jQuery CDN versions so this is super easy to set up. Remember to include a meta viewport tag in the head to set the zoom level.</p>
-		<p>You link to internal pages by referring to the <code>id</code> of the page you want to show. For example, to <a href="#two" >link</a> to the page with an <code>id</code> of "two", my link would have a <code>href="#two"</code> in the code.</p>
-
-		<h3>Show internal pages:</h3>
-		<p><a href="#two" class="ui-btn ui-shadow ui-corner-all">Show page "two"</a></p>
-		<p><a href="#popup" class="ui-btn ui-shadow ui-corner-all" data-rel="dialog" data-transition="pop">Show page "popup" (as a dialog)</a></p>
+			-->
+		<p><a href="#two" class="ui-btn ui-shadow ui-corner-all">Clientes</a></p>
+		<!--<p><a href="#popup" class="ui-btn ui-shadow ui-corner-all" data-rel="dialog" data-transition="pop">Show page "popup" (as a dialog)</a></p>-->
 	</div><!-- /content -->
 
-	<div data-role="footer" data-theme="a">
-		<h4>Page Footer</h4>
+	<div data-role="footer" data-theme="b">
+		<h4>2014</h4>
 	</div><!-- /footer -->
 </div><!-- /page one -->
 
 <!-- Start of second page: #two -->
 <div data-role="page" id="two" data-theme="a">
 
-	<div data-role="header">
+	<div data-role="header" data-theme="b">
 		<h1>Two</h1>
 	</div><!-- /header -->
 
-	<div role="main" class="ui-content">
-		<h2>Two</h2>
-		<p>I have an id of "two" on my page container. I'm the second page container in this multi-page template.</p>
-		<p>Notice that the theme is different for this page because we've added a few <code>data-theme</code> swatch assigments here to show off how flexible it is. You can add any content or widget to these pages, but we're keeping these simple.</p>
-		<p><a href="#one" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-b">Back to page "one"</a></p>
+	<div role="main" class="ui-content" data-theme="b">
+		<h2>Clientes descargados al dispositivo</h2>
+		<table data-role="table" id="table-column-toggle" data-mode="columntoggle" class="ui-responsive table-stroke">
+        	<thead>
+                <tr>
+                    <th data-priority="2">
+                    	#
+                    </th>
+                    <th data-priority="1">
+                    	Nombre
+                    </th>
+                    <th data-priority="3">
+                    	Localidad
+                    </th>
+                    <th data-priority="4">
+                    	Referencia
+                    </th>
+                    <th data-priority="5">
+                    	Tel&eacute;fono
+                    </th>                    
+                </tr>
+            </thead>
+            <tbody id="showClientes">
+            </tbody>
+        </table>
+        <script>
+			/*
+			carga los clientes a partir del JSON guardado en local storage
+			*/
+			var atr = localStorage.getItem("BD");//Obtener el objeto "BD" de Local Storage
+			var htmlTxt = "";
+			if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
+			{
+				myJSONObject ={"clientes": [{}], "productos":[{}]};
+			}else
+			{
+				myJSONObject = JSON.parse(""+atr);	
+			}
+			
+			$.each(myJSONObject['clientes'],function(i,elem){
+				htmlTxt +="<tr>";
+				htmlTxt += "<td>"+elem['numero']+"</td>";
+				htmlTxt += "<td>"+elem['nombre']+"</td>";
+				htmlTxt += "<td>"+elem['localidad']+"</td>";
+				htmlTxt += "<td>"+elem['referencia']+"</td>";
+				htmlTxt += "<td>"+elem['telefono']+"</td>";
+				htmlTxt += "</tr>";				
+			});
+			
+			$("#showClientes").html(htmlTxt);
+		</script>
+		<p><a href="#one" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-a">Regresar a men&uacute; principal</a></p>
 
 	</div><!-- /content -->
 
-	<div data-role="footer">
+	<div data-role="footer" data-theme="b">
 		<h4>Page Footer</h4>
 	</div><!-- /footer -->
 </div><!-- /page two -->
@@ -84,7 +127,7 @@
 		<p><a href="#one" data-rel="back" class="ui-btn ui-shadow ui-corner-all ui-btn-inline ui-icon-back ui-btn-icon-left">Back to page "one"</a></p>
 	</div><!-- /content -->
 
-	<div data-role="footer">
+	<div data-role="footer" data-theme="b">
 		<h4>Page Footer</h4>
 	</div><!-- /footer -->
 </div><!-- /page popup -->
