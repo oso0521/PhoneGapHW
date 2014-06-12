@@ -60,7 +60,7 @@
 		</script>
         <script>
 			var BASE_JSON={"clientes": [{}], "productos":[{}]};
-			$.getJSON( "http://dulceriabombon.movitbe.com/getClientes.php", function( data ) {
+			$.getJSON( "http://dulceriabombon.movitbe.com/getProductos.php", function( data ) {
 			 //console.log(data['Clientes']);
 			 BASE_JSON['clientes'] = data['Clientes'];
 			 console.log(BASE_JSON);
