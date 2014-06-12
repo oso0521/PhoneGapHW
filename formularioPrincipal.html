@@ -29,7 +29,7 @@
     	<h2>Seleccione Cliente:</h2>
         <select name="clienteSelect" id="clienteSelect">            
         </select>
-        <table data-role="table" id="table-column-toggle" data-mode="columntoggle" class="ui-responsive table-stroke">
+        <table data-role="table" id="table-column-toggle-clientes" data-mode="columntoggle" class="ui-responsive table-stroke">
         	<thead>
                 <tr>
                     <th data-priority="2">
@@ -56,7 +56,7 @@
         	Productos
         </h2>
        <a href="#" class="ui-shadow ui-btn ui-corner-all ui-btn-inline ui-icon-plus ui-btn-icon-notext ui-btn-b ui-mini">icon only button</a>
-        <table data-role="table" id="table-column-toggle" data-mode="columntoggle" class="ui-responsive table-stroke">
+        <table data-role="table" id="table-column-toggle-productos" data-mode="columntoggle" class="ui-responsive table-stroke">
         	<thead>
                 <tr>
                     <th data-priority="2">
@@ -81,14 +81,13 @@
                         </select>                    
                     </td>
                     <td>
-                        <input type="number" name="1_cantidad" id="1_cantidad" max="99999999" min="1" placeholder="CANTIDAD" />
+                        <input type="number" name="1_cantidad" id="1_cantidad" max="99999999" min="1" placeholder="CANTIDAD" class="cantidad" />
                     </td>
                     <td>
-                        <input type="number" name="1_precioU" id="1_precioU" max="99999999" min="1" placeholder="PRECIO U" />
+                        <input type="number" name="1_precioU" id="1_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU" />
                     </td>
                     <td>
-                    	<div id="1_subtotal">
-                        </div>
+                    	<div id="1_subtotal" class="subtotal"></div>
                     </td>
                 </tr>
                 <tr>
@@ -97,14 +96,13 @@
                         </select>                    
                     </td>
                     <td>
-                        <input type="number" name="2_cantidad" id="2_cantidad" max="99999999" min="1" placeholder="CANTIDAD" />
+                        <input type="number" name="2_cantidad" id="2_cantidad" max="99999999" min="1" placeholder="CANTIDAD" class="cantidad" />
                     </td>
                     <td>
-                        <input type="number" name="2_precioU" id="2_precioU" max="99999999" min="1" placeholder="PRECIO U" />
+                        <input type="number" name="2_precioU" id="2_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU" />
                     </td>
                     <td>
-                    	<div id="2_subtotal">
-                        </div>
+                    	<div id="2_subtotal" class="subtotal"></div>
                     </td>
                 </tr>
             </tbody>
@@ -236,9 +234,72 @@
 				$("#"+idNum+"_precioU").val(auxElem.data("cost"));
 				$("#"+idNum+"_cantidad").val("1");
 				$("#"+idNum+"_subtotal").html(auxElem.data("cost"));
-				
+				recalculaTotal();
 			});
 			
+			$(".cantidad").keyup(function(){
+				try
+				{
+					var idActual = $(this).prop("id").split("_")[0];
+					var cantidad=$(this).val();
+					if(cantidad == "" || typeof cantidad == typeof undefined || cantidad == null)
+					{
+						cantidad = 0;	
+					}
+					var precioU = $("#"+idActual+"_precioU").val();
+					if(precioU == "" || typeof precioU == typeof undefined || precioU == null)
+					{
+						precioU = 0;	
+					}
+					
+					var subtotal = parseFloat(cantidad)*parseFloat(precioU);
+					$("#"+idActual+"_subtotal").html(subtotal);
+					recalculaTotal();
+				}catch(err){}
+			});
+			
+			$(".precioU").keyup(function(){
+				try
+				{
+					var idActual = $(this).prop("id").split("_")[0];
+					var cantidad=$("#"+idActual+"_cantidad").val();
+					if(cantidad == "" || typeof cantidad == typeof undefined || cantidad == null)
+					{
+						cantidad = 0;	
+					}
+					var precioU = $(this).val();
+					if(precioU == "" || typeof precioU == typeof undefined || precioU == null)
+					{
+						precioU = 0;	
+					}
+					
+					var subtotal = parseFloat(cantidad)*parseFloat(precioU);
+					$("#"+idActual+"_subtotal").html(subtotal);
+					recalculaTotal();
+				}catch(err){}
+			});
+			
+			function recalculaTotal()
+			{
+				console.log("recalcula");
+				try
+				{
+					var total = 0;
+					$(".subtotal").each(function(index, elem) {                    
+						
+						var val = $(elem).html();
+						
+						if(val == "" || typeof val == typeof undefined || val == null || val.length == 0)
+						{
+							val = 0;	
+						}
+						
+						total += parseFloat(val);
+					});
+					console.log("total: "+total); 
+					$("#totalOC").html(total);
+				}catch(err){}
+			}
 	</script>
 </body>
 </html>
