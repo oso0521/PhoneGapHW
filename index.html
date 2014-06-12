@@ -35,13 +35,17 @@
         	Open
         </button>
         -->
+         <p><a href="formularioPrincipal.html" class="ui-btn ui-shadow ui-corner-all">
+        	Crear &Oacute;rden de Compra
+        </a></p>
+        
         <p><a href="cargaClientes.html" class="ui-btn ui-shadow ui-corner-all">
         	Carga Clientes
         </a></p>
 			
 		<p><a href="#two" class="ui-btn ui-shadow ui-corner-all">Clientes</a></p>
         
-         <p><a href="cargaClientes.html" class="ui-btn ui-shadow ui-corner-all">
+         <p><a href="cargaProductos.html" class="ui-btn ui-shadow ui-corner-all">
         	Carga Productos
         </a></p>
         
@@ -90,7 +94,7 @@
 			/*
 			carga los clientes a partir del JSON guardado en local storage
 			*/
-			var atr = localStorage.getItem("BD");//Obtener el objeto "BD" de Local Storage
+			var atr = localStorage.getItem("Clientes");//Obtener el objeto "BD" de Local Storage
 			var htmlTxt = "";
 			if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
 			{
@@ -154,7 +158,7 @@
 			/*
 			carga los clientes a partir del JSON guardado en local storage
 			*/
-			var atr = localStorage.getItem("BD");//Obtener el objeto "BD" de Local Storage
+			var atr = localStorage.getItem("Productos");//Obtener el objeto "BD" de Local Storage
 			var htmlTxt = "";
 			if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
 			{

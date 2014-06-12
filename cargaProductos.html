@@ -59,20 +59,18 @@
 			});
 		</script>
         <script>
-			var BASE_JSON={"clientes": [{}], "productos":[{}]};
+			var BASE_JSON={"productos":[{}]};
 			$.getJSON( "http://dulceriabombon.movitbe.com/getProductos.php", function( data ) {
 			 //console.log(data['Clientes']);
-			 BASE_JSON['clientes'] = data['Clientes'];
+			 BASE_JSON['productos'] = data['Productos'];
 			 console.log(BASE_JSON);
-			 window.localStorage.setItem("BD",JSON.stringify(BASE_JSON) );
+			 window.localStorage.setItem("Productos",JSON.stringify(BASE_JSON) );
 			 			  
 			});
 		</script>
     </head>
     <body>
-    	<ul>
-        	
-        </ul>
+    	
         <div id="pop">
         	Comenzando la sincronización de productos.
         </div>

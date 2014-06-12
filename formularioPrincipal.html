@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Dulcer&iacute;a Bomb&oacute;n Pto. Es.</title>
+	<link rel="stylesheet" href="jquery-mobile/jquery.mobile-1.4.2.min.css">
+	
+	<link rel="shortcut icon" href="../favicon.ico">
+	<script src="jquery-mobile/jquery.js"></script>
+	<script src="js/index.js"></script>
+	<script src="jquery-mobile/jquery.mobile-1.4.2.min.js"></script>
+</head>
+
+<body>
+<style>
+	label
+	{
+		padding-left:10px;
+		font-weight:bold;
+		margin-top:10px;		
+	}
+</style>
+	<div data-role="header" data-theme="b">
+		<h1>Nueva Orden de Compra</h1>
+	</div><!-- /header -->
+	<form>
+    	
+    	<h2>Seleccione Cliente:</h2>
+        <select name="clienteSelect" id="clienteSelect">            
+        </select>
+        <table data-role="table" id="table-column-toggle" data-mode="columntoggle" class="ui-responsive table-stroke">
+        	<thead>
+                <tr>
+                    <th data-priority="2">
+                    	#
+                    </th>
+                    <th data-priority="1">
+                    	Nombre
+                    </th>
+                    <th data-priority="3">
+                    	Localidad
+                    </th>
+                    <th data-priority="4">
+                    	Referencia
+                    </th>
+                    <th data-priority="5">
+                    	Tel&eacute;fono
+                    </th>                    
+                </tr>
+            </thead>
+            <tbody id="myCliente">
+            </tbody>
+        </table>
+    	<h2>
+        	Productos
+        </h2>
+       <a href="#" class="ui-shadow ui-btn ui-corner-all ui-btn-inline ui-icon-plus ui-btn-icon-notext ui-btn-b ui-mini">icon only button</a>
+        <table data-role="table" id="table-column-toggle" data-mode="columntoggle" class="ui-responsive table-stroke">
+        	<thead>
+                <tr>
+                    <th data-priority="2">
+                    	Producto
+                    </th>
+                    <th data-priority="1">
+                    	Cantidad
+                    </th>
+                    <th data-priority="3">
+                    	Precio unitario
+                    </th>
+                    <th data-priority="4">
+                    	Subtotal
+                    </th>
+                                      
+                </tr>
+            </thead>
+            <tbody id="productosOC">
+            	<tr>
+                    <td>
+                        <select name="1_producto" id="1_producto" class="selectProducto">
+                        </select>                    
+                    </td>
+                    <td>
+                        <input type="number" name="1_cantidad" id="1_cantidad" max="99999999" min="1" placeholder="CANTIDAD" />
+                    </td>
+                    <td>
+                        <input type="number" name="1_precioU" id="1_precioU" max="99999999" min="1" placeholder="PRECIO U" />
+                    </td>
+                    <td>
+                    	<div id="1_subtotal">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <select name="2_producto" id="2_producto" class="selectProducto">
+                        </select>                    
+                    </td>
+                    <td>
+                        <input type="number" name="2_cantidad" id="2_cantidad" max="99999999" min="1" placeholder="CANTIDAD" />
+                    </td>
+                    <td>
+                        <input type="number" name="2_precioU" id="2_precioU" max="99999999" min="1" placeholder="PRECIO U" />
+                    </td>
+                    <td>
+                    	<div id="2_subtotal">
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+            <tfoot>
+            	<tr>
+                	<th>
+                    </th>
+                    <th>
+                    </th>
+                    <th>
+                    	Total
+                    </th>
+                    <th>
+                    	<div id="totalOC">
+                        </div>
+                    </th>
+                </tr>
+            </tfoot>
+        </table>  
+        <h2>
+        	Observaciones:
+        </h2> 
+        <textarea id="observaciones" name="observaciones"></textarea>
+    </form>
+    
+    <script>
+			/*
+			carga los clientes a partir del JSON guardado en local storage para ponerlos en el select
+			*/
+			var atr = localStorage.getItem("Clientes");//Obtener el objeto "BD" de Local Storage
+			var htmlTxt = "";
+			
+			if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
+			{
+				clientes ={"clientes": [{}]};
+			}else
+			{
+				clientes = JSON.parse(""+atr);	
+			}
+			
+			
+			htmlTxt +="<option value=\" \">";				
+			htmlTxt += "Seleccione...</option>";
+			$.each(clientes['clientes'],function(i,elem){
+				htmlTxt +="<option value=\""+elem['idCliente']+"\">";				
+				htmlTxt += ""+elem['nombre']+"</option>";					
+			});
+			
+			$("#clienteSelect").html(htmlTxt);
+			/*
+			Fin carga de cliente
+			**********************************************************
+			***********************************************************
+			*/
+			
+			/*
+			Función para cargar datos del cliente cargado
+			*/
+			$("#clienteSelect").change(function(){
+				
+				/*
+				carga los clientes a partir del JSON guardado en local storage
+				*/
+				var atr = localStorage.getItem("Clientes");//Obtener el objeto "BD" de Local Storage
+				var htmlTxt = "";
+				if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
+				{
+					myJSONObject ={"clientes": [{}]};
+				}else
+				{
+					myJSONObject = JSON.parse(""+atr);	
+				}
+				
+				
+				$.each(myJSONObject['clientes'],function(i,elem){
+					
+					if($("#clienteSelect").val() == elem['idCliente'])
+					{
+						htmlTxt +="<tr>";
+						htmlTxt += "<td>"+elem['numero']+"</td>";
+						htmlTxt += "<td>"+elem['nombre']+"</td>";
+						htmlTxt += "<td>"+elem['localidad']+"</td>";
+						htmlTxt += "<td>"+elem['referencia']+"</td>";
+						htmlTxt += "<td>"+elem['telefono']+"</td>";
+						htmlTxt += "</tr>";	
+						$("#myCliente").html(htmlTxt);
+						return;
+					}
+				});
+				
+					
+			});
+			
+			/****************************************************************************
+			******************************  FIN CHANGE CLIENTE ***************************
+			******************************************************************************/
+			/*
+				Manejo de Productos
+			*/
+			
+			var atr = localStorage.getItem("Productos");//Obtener el objeto "BD" de Local Storage
+			var htmlTxt = "";
+			
+			if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
+			{
+				clientes ={"productos": [{}]};
+			}else
+			{
+				clientes = JSON.parse(""+atr);	
+			}
+			
+			
+			htmlTxt +="<option value=\" \">";				
+			htmlTxt += "Seleccione...</option>";
+			$.each(clientes['productos'],function(i,elem){
+				htmlTxt +="<option data-cost=\""+elem['precio']+"\" value=\""+elem['idProducto']+"\">";				
+				htmlTxt += ""+elem['nombre']+"</option>";					
+			});
+			
+			$(".selectProducto").html(htmlTxt);
+			
+			$(".selectProducto").change(function()
+			{
+				var idNum = $(this).prop("id").split("_")[0];
+				$(this).addClass("active");
+				$(".selectProducto:not(.active) option[value='"+$(this).val()+"']").remove();	
+				$(this).removeClass("active");
+				var auxElem = $(this).find("option:selected");
+				$("#"+idNum+"_precioU").val(auxElem.data("cost"));
+				$("#"+idNum+"_cantidad").val("1");
+				$("#"+idNum+"_subtotal").html(auxElem.data("cost"));
+				
+			});
+			
+	</script>
+</body>
+</html>

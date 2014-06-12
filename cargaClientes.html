@@ -59,12 +59,12 @@
 			});
 		</script>
         <script>
-			var BASE_JSON={"clientes": [{}], "productos":[{}]};
+			var BASE_JSON={"clientes": [{}]};
 			$.getJSON( "http://dulceriabombon.movitbe.com/getClientes.php", function( data ) {
 			 //console.log(data['Clientes']);
 			 BASE_JSON['clientes'] = data['Clientes'];
 			 console.log(BASE_JSON);
-			 window.localStorage.setItem("BD",JSON.stringify(BASE_JSON) );
+			 window.localStorage.setItem("Clientes",JSON.stringify(BASE_JSON) );
 			 			  
 			});
 		</script>
