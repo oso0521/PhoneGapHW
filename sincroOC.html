@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Dulcer&iacute;a Bomb&oacute;n Pto. Es.</title>
+	<link rel="stylesheet" href="jquery-mobile/jquery.mobile-1.4.2.min.css">
+	
+	<link rel="shortcut icon" href="../favicon.ico">
+	<script src="jquery-mobile/jquery.js"></script>
+	<script src="js/index.js"></script>
+	<script src="jquery-mobile/jquery.mobile-1.4.2.min.js"></script>
+</head>
+
+<body>
+	<style>
+		.red
+		{
+			background-color:#C00 !important;
+			color:white !important;
+			font-weight:500 !important;
+		}
+	</style>
+	<div data-role="header" data-theme="b">
+		<h1>Sincroniza Ordenes de compra</h1>
+	</div><!-- /header -->
+    <div>
+    		<table data-role="table" id="table-column-toggle-oc" data-mode="columntoggle" class="ui-responsive table-stroke">
+        	<thead>
+            	<tr>
+                	<th>
+                    	#
+                    </th>
+                    <th>
+                    	Fecha creacion
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="ocBody">
+            	
+            </tbody>
+            <tfoot>
+            </tfoot>
+            
+        </table>
+        <h2 id="msgSincro">
+        </h2>
+        <button onclick="sincroniza()">
+        	Sincronizar
+        </button>
+        
+         <p><a href="index.html" class="ui-btn ui-shadow ui-corner-all">
+        	Regresar a p&aacute;gina principal
+        </a></p>
+    </div>
+    <script>
+		function cargaTabla()
+		{
+			var atr = localStorage.getItem("OC");//Obtener el objeto "BD" de Local Storage
+			var htmlTxt = "";
+			
+			if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
+			{
+				$("#ocBody").html('<tr><td colspan="2"><h2>No existen ordenes de compra</h2></td></tr>');
+			}else
+			{
+				oc = JSON.parse(""+atr);
+				//console.log(Object.keys(oc['oc']).length); 
+				if(Object.keys(oc['oc']).length < 2)
+				{
+					$("#ocBody").html('<tr><td colspan="2"><h2>No existen &oacute;rdenes de compra</h2></td></tr>');
+					return;	
+				}
+				var htmlTxt = "";
+				$.each(oc['oc'],function(i,elem){
+					if(elem['fecha'] != undefined)
+					{					
+						console.log(elem);
+						htmlTxt += '<tr>';	
+						htmlTxt += '<td>'+i+'</td>';
+						htmlTxt += '<td>'+elem['fecha']+'</td></tr>';		
+					}
+				});	
+				$("#ocBody").html(htmlTxt);
+			}
+		}
+		function sincroniza()
+		{
+			var atr = localStorage.getItem("OC");//Obtener el objeto "BD" de Local Storage
+			var htmlTxt = "";
+			
+			if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
+			{
+				$("#ocBody").html('<tr><td colspan="2"><h2>No existen ordenes de compra</h2></td></tr>');
+				return;
+			}else
+			{			
+				oc = JSON.parse(""+atr);
+				//console.log(Object.keys(oc).length); 
+				if(Object.keys(oc['oc']).length < 2)
+				{
+					$("#ocBody").html('<tr><td colspan="2"><h2>No existen &oacute;rdenes de compra</h2></td></tr>');
+					return;	
+				}	
+				$.post("http://dulceriabombon.movitbe.com/guardaOC.php","oc="+atr,function(e){
+					try
+					{
+						if(parseInt(e.split(":::")[0]) == 1)
+						{
+							$("#msgSincro").html(e.split(":::")[1]);
+							myJSONObject ={"oc":[{}]};
+							window.localStorage.setItem("OC",JSON.stringify(myJSONObject) );
+							cargaTabla();	
+						}else
+						{
+							$("#msgSincro").addClass("red");
+							$("#msgSincro").html(e.split(":::")[1]);
+							
+						}
+					}catch(err){}
+					
+				});
+			}	
+		}
+		
+		cargaTabla();
+	</script>
+</body>
+</html>
