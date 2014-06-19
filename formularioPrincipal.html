@@ -35,34 +35,14 @@
     	
     	<h2>Seleccione Cliente:</h2>
         <select name="clienteSelect" id="clienteSelect" required="required" class="requerido"></select>
-        <table data-role="table" id="table-column-toggle-clientes" data-mode="columntoggle" class="ui-responsive table-stroke">
-        	<thead>
-                <tr>
-                    <th data-priority="2">
-                    	#
-                    </th>
-                    <th data-priority="1">
-                    	Nombre
-                    </th>
-                    <th data-priority="3">
-                    	Localidad
-                    </th>
-                    <th data-priority="4">
-                    	Referencia
-                    </th>
-                    <th data-priority="5">
-                    	Tel&eacute;fono
-                    </th>                    
-                </tr>
-            </thead>
-            <tbody id="myCliente">
-            </tbody>
-        </table>
+       	<div id="tablaClientes">
+        </div>
     	<h2>
         	Productos
         </h2>
        <a href="#" class="ui-shadow ui-btn ui-corner-all ui-btn-inline ui-icon-plus ui-btn-icon-notext ui-btn-b ui-mini" onclick="addProducto()">icon only button</a>
-        <table data-role="table" id="table-column-toggle-productos" data-mode="columntoggle" class="ui-responsive table-stroke">
+        <div id="contenedorProductos">
+        <table data-role="table" id="table-column-toggle-productos" data-mode="reflow" class="ui-responsive table-stroke">
         	<thead>
                 <tr>
                     <th data-priority="2">
@@ -128,6 +108,7 @@
                 </tr>
             </tfoot>
         </table>  
+        </div>
         <h2>
         	Observaciones:
         </h2> 
@@ -196,7 +177,28 @@
 					myJSONObject = JSON.parse(""+atr);	
 				}
 				
-				
+				htmlTxt = ' <table data-role="table" id="table-column-toggle-clientes" data-mode="columntoggle" class="ui-responsive table-stroke">';
+        		htmlTxt += '<thead>';
+                htmlTxt += '<tr>';
+                htmlTxt += '    <th data-priority="2">';
+                htmlTxt += '   	#';
+                htmlTxt += '    </th>';
+                htmlTxt += '    <th data-priority="1">';
+                htmlTxt += '    	Nombre';
+                htmlTxt += '    </th>';
+                htmlTxt += '    <th data-priority="3">';
+                htmlTxt += '    	Localidad';
+                htmlTxt += '    </th>';
+                htmlTxt += '    <th data-priority="4">';
+                htmlTxt += '    	Referencia';
+                htmlTxt += '    </th>';
+                htmlTxt += '    <th data-priority="5">';
+                htmlTxt += '    	Tel&eacute;fono';
+                htmlTxt += '    </th>                    ';
+                htmlTxt += '</tr>';
+            	htmlTxt += '</thead>';
+            	htmlTxt += '<tbody id="myCliente">';
+            	
 				$.each(myJSONObject['clientes'],function(i,elem){
 					console.log(i);
 					if($("#clienteSelect").val() == elem['idCliente'])
@@ -208,7 +210,9 @@
 						htmlTxt += "<td>"+elem['referencia']+"</td>";
 						htmlTxt += "<td>"+elem['telefono']+"</td>";
 						htmlTxt += "</tr>";	
-						$("#myCliente").html(htmlTxt);
+						htmlTxt += '</tbody>';
+        				htmlTxt += '</table>';
+						$("#tablaClientes").html(htmlTxt).enhanceWithin();
 						return;
 					}
 				});
@@ -268,7 +272,7 @@
 			{
 				var html = "";
 				
-					html="";
+					
 					html += '<tr>';
                     html += '<td class="ui-table-priority-2">';
                     html += '    <div class="ui-select"><div id="'+countProductos+'_producto-button" class="ui-btn ui-icon-carat-d ui-btn-icon-right ui-corner-all ui-shadow"><span class="selectProducto">Seleccione...</span><select name="'+countProductos+'_producto" id="'+countProductos+'_producto" class="selectProducto cargarProductos"></select></div></div>                    ';
@@ -283,11 +287,11 @@
                     html += '	<div id="'+countProductos+'_subtotal" class="subtotal"></div>';
                     html += '</td>';
                 	html += '</tr>';
-					
+					//$("#table-column-toggle-productos").remove();
 					$("#productosOC").append(html);
 					countProductos++;					
 					cargaProductosSelect();
-					$("#table-column-toggle-productos").table-columntoggle("refresh");
+					//$("#table-column-toggle-productos");
 			}
 			
 			function cargaProductosSelect()
