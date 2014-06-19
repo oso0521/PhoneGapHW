@@ -20,15 +20,21 @@
 		font-weight:bold;
 		margin-top:10px;		
 	}
+	
+	.red
+	{
+		background-color:#C00 !important;
+		color:white !important;
+		font-weight:500 !important;
+	}
 </style>
 	<div data-role="header" data-theme="b">
 		<h1>Nueva Orden de Compra</h1>
 	</div><!-- /header -->
-	<form>
+	<form action="javascript:guardaForm()">
     	
     	<h2>Seleccione Cliente:</h2>
-        <select name="clienteSelect" id="clienteSelect">            
-        </select>
+        <select name="clienteSelect" id="clienteSelect" required="required" class="requerido"></select>
         <table data-role="table" id="table-column-toggle-clientes" data-mode="columntoggle" class="ui-responsive table-stroke">
         	<thead>
                 <tr>
@@ -55,7 +61,7 @@
     	<h2>
         	Productos
         </h2>
-       <a href="#" class="ui-shadow ui-btn ui-corner-all ui-btn-inline ui-icon-plus ui-btn-icon-notext ui-btn-b ui-mini">icon only button</a>
+       <a href="#" class="ui-shadow ui-btn ui-corner-all ui-btn-inline ui-icon-plus ui-btn-icon-notext ui-btn-b ui-mini" onclick="addProducto()">icon only button</a>
         <table data-role="table" id="table-column-toggle-productos" data-mode="columntoggle" class="ui-responsive table-stroke">
         	<thead>
                 <tr>
@@ -125,9 +131,23 @@
         <h2>
         	Observaciones:
         </h2> 
-        <textarea id="observaciones" name="observaciones"></textarea>
+        <textarea id="observaciones" name="observaciones" style="width:90%; height:300px; margin:0px auto;" placeholder="ESCRIBA AQUI SUS OBSERVACIONES"></textarea>
+        <div id="errorMessage"></div>
+        <div style="width:100%; text-align:center;">
+            <a href="#popupLogin" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop" style="margin-left:auto; margin-right:auto;">Guardar</a>
+    <div data-role="popup" id="popupLogin" data-overlay-theme="b" data-theme="a" class="ui-corner-all">
+       
+            <div style="padding:10px 20px;">
+                <h3>¿Realmente desea guardar?</h3>
+               <button type="submit">Guardar</button>
+                <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">Cancelar</a>
+            </div>
+        </div>
+   
+</div>
+        
     </form>
-    
+   
     <script>
 			/*
 			carga los clientes a partir del JSON guardado en local storage para ponerlos en el select
@@ -144,7 +164,7 @@
 			}
 			
 			
-			htmlTxt +="<option value=\" \">";				
+			htmlTxt +="<option value=\"\">";				
 			htmlTxt += "Seleccione...</option>";
 			$.each(clientes['clientes'],function(i,elem){
 				htmlTxt +="<option value=\""+elem['idCliente']+"\">";				
@@ -178,7 +198,7 @@
 				
 				
 				$.each(myJSONObject['clientes'],function(i,elem){
-					
+					console.log(i);
 					if($("#clienteSelect").val() == elem['idCliente'])
 					{
 						htmlTxt +="<tr>";
@@ -208,17 +228,17 @@
 			
 			if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
 			{
-				clientes ={"productos": [{}]};
+				productos ={"productos": [{}]};
 			}else
 			{
-				clientes = JSON.parse(""+atr);	
+				productos = JSON.parse(""+atr);	
 			}
 			
 			
-			htmlTxt +="<option value=\" \">";				
+			htmlTxt +="<option value=\"\">";				
 			htmlTxt += "Seleccione...</option>";
-			$.each(clientes['productos'],function(i,elem){
-				htmlTxt +="<option data-cost=\""+elem['precio']+"\" value=\""+elem['idProducto']+"\">";				
+			$.each(productos['productos'],function(i,elem){
+				htmlTxt +="<option data-count=\""+i+"\" data-cost=\""+elem['precio']+"\" value=\""+elem['idProducto']+"\">";				
 				htmlTxt += ""+elem['nombre']+"</option>";					
 			});
 			
@@ -227,15 +247,67 @@
 			$(".selectProducto").change(function()
 			{
 				var idNum = $(this).prop("id").split("_")[0];
-				$(this).addClass("active");
-				$(".selectProducto:not(.active) option[value='"+$(this).val()+"']").remove();	
-				$(this).removeClass("active");
+				//$(this).addClass("active");
+				//$(".selectProducto:not(.active) option[value='"+$(this).val()+"']").remove();	
+				//$(this).removeClass("active");
 				var auxElem = $(this).find("option:selected");
 				$("#"+idNum+"_precioU").val(auxElem.data("cost"));
 				$("#"+idNum+"_cantidad").val("1");
 				$("#"+idNum+"_subtotal").html(auxElem.data("cost"));
 				recalculaTotal();
+				var i = auxElem.data("count");
+				//console.log(productos['productos']);
+				//delete (productos['productos'][i]);
+				//console.log(productos['productos']);
 			});
+			
+			
+			
+			var countProductos=3;
+			function addProducto()
+			{
+				var html = "";
+				
+					html="";
+					html += '<tr>';
+                    html += '<td class="ui-table-priority-2">';
+                    html += '    <div class="ui-select"><div id="'+countProductos+'_producto-button" class="ui-btn ui-icon-carat-d ui-btn-icon-right ui-corner-all ui-shadow"><span class="selectProducto">Seleccione...</span><select name="'+countProductos+'_producto" id="'+countProductos+'_producto" class="selectProducto cargarProductos"></select></div></div>                    ';
+                    html += '</td>';
+                   	html += ' <td class="ui-table-priority-1">';
+                  	html += '     <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset"><input type="number" name="'+countProductos+'_cantidad" id="'+countProductos+'_cantidad" max="99999999" min="1" placeholder="CANTIDAD" class="cantidad cargarCantidad"></div>';
+                    html += '</td>';
+                    html += ' <td class="ui-table-priority-3">';
+                    html += '    <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset"><input type="number" name="'+countProductos+'_precioU" id="'+countProductos+'_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU cargarPrecioU"></div>';
+                    html += '</td>';
+                    html += '<td class="ui-table-priority-4">';
+                    html += '	<div id="'+countProductos+'_subtotal" class="subtotal"></div>';
+                    html += '</td>';
+                	html += '</tr>';
+					
+					$("#productosOC").append(html);
+					countProductos++;
+					cargaProductosSelect()
+				
+			}
+			
+			function cargaProductosSelect()
+			{
+				var htmlSelect = "";
+				htmlSelect +="<option value=\" \">";				
+				htmlSelect += "Seleccione...</option>";
+				$.each(productos['productos'],function(i,elem){
+						if(elem == "" || typeof elem == typeof undefined || elem == null)
+						{
+							return;	  
+						}else
+						{							
+							htmlSelect +="<option data-count=\""+i+"\" data-cost=\""+elem['precio']+"\" value=\""+elem['idProducto']+"\">";				
+							htmlSelect += ""+elem['nombre']+"</option>";
+						}
+					}); 	
+				$(".cargarProductos").html(htmlSelect);
+				prepareSelect();
+			}
 			
 			$(".cantidad").keyup(function(){
 				try
@@ -253,7 +325,7 @@
 					}
 					
 					var subtotal = parseFloat(cantidad)*parseFloat(precioU);
-					$("#"+idActual+"_subtotal").html(subtotal);
+					$("#"+idActual+"_subtotal").html(subtotal.toFixed(2));
 					recalculaTotal();
 				}catch(err){}
 			});
@@ -274,7 +346,7 @@
 					}
 					
 					var subtotal = parseFloat(cantidad)*parseFloat(precioU);
-					$("#"+idActual+"_subtotal").html(subtotal);
+					$("#"+idActual+"_subtotal").html(subtotal.toFixed(2));
 					recalculaTotal();
 				}catch(err){}
 			});
@@ -297,9 +369,153 @@
 						total += parseFloat(val);
 					});
 					console.log("total: "+total); 
-					$("#totalOC").html(total);
+					$("#totalOC").html("$"+total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'));
 				}catch(err){}
 			}
+			
+			function prepareSelect()
+			{
+				$(".cargarProductos").unbind("change").change(function()
+					{
+						var idNum = $(this).prop("id").split("_")[0];
+						$(this).parent().find("span").html($(this).find("option:selected").html());
+						//$(this).addClass("active");
+						//$(".selectProducto:not(.active) option[value='"+$(this).val()+"']").remove();	
+						//$(this).removeClass("active");
+						var auxElem = $(this).find("option:selected");
+						$("#"+idNum+"_precioU").val(auxElem.data("cost"));
+						$("#"+idNum+"_cantidad").val("1");
+						$("#"+idNum+"_subtotal").html(auxElem.data("cost"));
+						recalculaTotal();
+						var i = auxElem.data("count");
+						//console.log(productos['productos']);
+						//delete (productos['productos'][i]);
+						//console.log(productos['productos']);
+					});
+					$(".cargarProductos").removeClass(".cargarProductos");
+					$(".cargarCantidad").keyup(function(){
+					try
+					{
+						var idActual = $(this).prop("id").split("_")[0];
+						var cantidad=$(this).val();
+						if(cantidad == "" || typeof cantidad == typeof undefined || cantidad == null)
+						{
+							cantidad = 0;	
+						}
+						var precioU = $("#"+idActual+"_precioU").val();
+						if(precioU == "" || typeof precioU == typeof undefined || precioU == null)
+						{
+							precioU = 0;	
+						}
+						
+						var subtotal = parseFloat(cantidad)*parseFloat(precioU);
+						$("#"+idActual+"_subtotal").html(subtotal.toFixed(2));
+						recalculaTotal();
+					}catch(err){}
+				});
+				$(".cargarCantidad").removeClass(".cargarCantidad");
+				$(".cargarPrecioU").keyup(function(){
+					try
+					{
+						var idActual = $(this).prop("id").split("_")[0];
+						var cantidad=$("#"+idActual+"_cantidad").val();
+						if(cantidad == "" || typeof cantidad == typeof undefined || cantidad == null)
+						{
+							cantidad = 0;	
+						}
+						var precioU = $(this).val();
+						if(precioU == "" || typeof precioU == typeof undefined || precioU == null)
+						{
+							precioU = 0;	
+						}
+						
+						var subtotal = parseFloat(cantidad)*parseFloat(precioU);
+						$("#"+idActual+"_subtotal").html(subtotal.toFixed(2));
+						recalculaTotal();
+					}catch(err){}
+				});
+				$(".cargarPrecioU").removeClass(".cargarPrecioU");
+			}
+		
+		var todobien = true;
+		function guardaForm()
+		{
+			todobien=true;
+			var mensaje="";
+			var myJSON = "";
+			var countProductosActivos=0;
+			var idCliente = $("#clienteSelect").val();
+			var now = new Date();
+			var fecha = now.getFullYear()+"-"+(now.getMonth()+1)+"-"+ now.getDate()+" "+now.getHours()+":"+now.getMinutes();
+			//console.log(fecha);
+			//console.log("cliente: "+idCliente+" :: "+typeof idCliente);
+			if(idCliente=="")
+			{
+				mensaje += '<a href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left red">Debe seleccionar un cliente</a>';
+				todobien = false;	
+			}
+			myJSON = '"productos":[';
+			$(".selectProducto").each(function(i,elem){
+				var id = $(this).prop("id").split("_")[0];
+				try
+				{
+				if($(this).val() != "" && ($("#"+id+"_cantidad").val() == "" || $("#"+id+"_precioU").val() == "" || parseFloat($("#"+id+"_cantidad").val())<=0 || parseFloat($("#"+id+"_precioU").val())<= 0))
+				{
+					todobien = false;
+					mensaje += '<a href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left red">Debe proporcionar valores validos para cantidad y precio unitario</a>';
+				}else if($(this).val()!="")//hubo por lo menos un producto seleccionado
+				{
+					if(countProductosActivos++>0)
+						myJSON += ",";
+					myJSON += '{"idProducto":"'+$(this).val()+'","cantidad":"'+$("#"+id+"_cantidad").val()+'"}';
+				}
+				}catch(err){console.log(err)}
+			});
+			myJSON += "]";
+			if(countProductosActivos==0)
+			{
+				todobien = false;
+				mensaje += '<a href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left red">Debe ingresar por lo menos un producto</a>';
+			}	
+			
+			if(!todobien)
+			{
+				$("#errorMessage").html(mensaje);
+				return;	
+			}else
+			{
+				$("#errorMessage").html('');	
+			}
+			
+			
+			
+			var params=$("form").serialize().split("&");
+			//console.log("len: "+ );
+			myJSON ='{"idCliente":"'+idCliente+'","fecha":"'+fecha+'","idPromotor":"","comentarios":"'+params[params.length-1].split("=")[1]+'",'+myJSON+"}";
+			/*
+			Traer elemento de localstorage para guardar la nueva orden de compra
+			/*/
+			
+			var atr = localStorage.getItem("OC");//Obtener el objeto "OC" ordenes de compra de Local Storage
+			
+			var htmlTxt = "";
+			if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
+			{
+				myJSONObject ={"oc":[{}]};
+			}else
+			{
+				myJSONObject = JSON.parse(""+atr);	
+			}
+			myJSONObject['oc'].push($.parseJSON(myJSON));
+			
+			//console.log(myJSONObject);
+			
+			window.localStorage.setItem("OC",JSON.stringify(myJSONObject) );
+		}
+		
+		
 	</script>
+    
+    
 </body>
 </html>
