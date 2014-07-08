@@ -339,16 +339,16 @@
 					
 					html += '<tr>';
                     html += '<td class="ui-table-priority-1">';
-                    html += '    <div class="ui-select"><div id="'+countProductos+'_producto-button" class="ui-btn ui-icon-carat-d ui-btn-icon-right ui-corner-all ui-shadow"><span class="selectProducto">Seleccione...</span><select name="'+countProductos+'_producto" id="'+countProductos+'_producto" class="selectProducto cargarProductos"></select></div></div>                    ';
+                    html += '   <select name="'+countProductos+'_producto" id="'+countProductos+'_producto" class="selectProducto cargarProductos"></select>                    ';
                     html += '</td>';
                    	html += ' <td class="ui-table-priority-2">';
-                  	html += '     <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset"><input type="number" name="'+countProductos+'_cantidad" id="'+countProductos+'_cantidad" max="99999999" min="1" placeholder="CANTIDAD" class="cantidad cargarCantidad"></div>';
+                  	html += '    <input type="number" name="'+countProductos+'_cantidad" id="'+countProductos+'_cantidad" max="99999999" min="1" placeholder="CANTIDAD" class="cantidad cargarCantidad">';
                     html += '</td>';
 					 html += '<td class="ui-table-priority-3">';
                     html += '   <select name="'+countProductos+'_unidad" id="'+countProductos+'_unidad" class="selectUnidad cargaUnidad"></select>   ';
                     html += '</td>';
                     html += ' <td class="ui-table-priority-4">';
-                    html += '    <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset"><input type="number" name="'+countProductos+'_precioU" id="'+countProductos+'_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU cargarPrecioU" readonly=\"readonly\" /></div>';
+                    html += '    <input type="number" name="'+countProductos+'_precioU" id="'+countProductos+'_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU cargarPrecioU" readonly=\"readonly\" />';
                     html += '</td>';
                     html += '<td class="ui-table-priority-5">';
                     html += '	<div id="'+countProductos+'_subtotal" class="subtotal"></div>';
@@ -359,7 +359,11 @@
 					
 					countProductos++;					
 					cargaProductosSelect();
-					//$("#table-column-toggle-productos");
+					
+					$("#table-column-toggle-productos-popup").remove();
+					$("#table-column-toggle-productos").append(htmlTxt).enhanceWithin();
+					
+					//$("#table-column-toggle-productos").table();
 			}
 			
 			/*
@@ -538,7 +542,7 @@
 						
 						$("#"+idNum+"_unidad").html(unidades);
 						$("#"+idNum+"_unidad").parent().find("span").html(auxElem.data("unidad"));
-						$("#"+idNum+"_unidad").selectmenu();
+						//$("#"+idNum+"_unidad").selectmenu();
 						//console.log(productos['productos']);
 						//delete (productos['productos'][i]);
 						//console.log(productos['productos']);
