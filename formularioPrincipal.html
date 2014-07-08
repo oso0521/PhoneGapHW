@@ -27,6 +27,17 @@
 		color:white !important;
 		font-weight:500 !important;
 	}
+	
+	.cantidad, .precioU, .table-stroke div.ui-input-text
+	{
+		width:100px !important;		
+	}
+	
+	.inputContainer
+	{
+		width:120px !important;		
+	}
+	
 </style>
 	<div data-role="header" data-theme="b">
 		<h1>Nueva Orden de Compra</h1>
@@ -45,16 +56,19 @@
         <table data-role="table" id="table-column-toggle-productos" data-mode="columntoggle" class="ui-responsive table-stroke">
         	<thead>
                 <tr>
-                    <th data-priority="2">
+                    <th data-priority="1">
                     	Producto
                     </th>
-                    <th data-priority="1">
+                    <th data-priority="2" class="inputContainer">
                     	Cantidad
                     </th>
-                    <th data-priority="3">
+                     <th data-priority="3">
+                    	Unidad
+                    </th>
+                    <th data-priority="4" class="inputContainer">
                     	Precio unitario
                     </th>
-                    <th data-priority="4">
+                    <th data-priority="5" class="inputContainer">
                     	Subtotal
                     </th>
                                       
@@ -66,11 +80,15 @@
                         <select name="1_producto" id="1_producto" class="selectProducto">
                         </select>                    
                     </td>
-                    <td>
+                    <td >
                         <input type="number" name="1_cantidad" id="1_cantidad" max="99999999" min="1" placeholder="CANTIDAD" class="cantidad" />
                     </td>
                     <td>
-                        <input type="number" name="1_precioU" id="1_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU" />
+                    	<select name="1_unidad" id="1_unidad" class="selectUnidad">
+                        </select>
+                    </td>
+                    <td >
+                        <input type="number" name="1_precioU" id="1_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU" readonly="readonly" />
                     </td>
                     <td>
                     	<div id="1_subtotal" class="subtotal"></div>
@@ -81,11 +99,14 @@
                         <select name="2_producto" id="2_producto" class="selectProducto">
                         </select>                    
                     </td>
-                    <td>
+                    <td class="inputContainer">
                         <input type="number" name="2_cantidad" id="2_cantidad" max="99999999" min="1" placeholder="CANTIDAD" class="cantidad" />
                     </td>
                     <td>
-                        <input type="number" name="2_precioU" id="2_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU" />
+                        <select name="2_unidad" id="2_unidad" class="selectUnidad"> </select>
+                    </td>
+                    <td class="inputContainer">
+                        <input type="number" name="2_precioU" id="2_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU" readonly="readonly" />
                     </td>
                     <td>
                     	<div id="2_subtotal" class="subtotal"></div>
@@ -130,6 +151,7 @@
     </form>
    
     <script>
+			var MAYOREO = 50; //Numero de elementos para que se considere mayoreo
 			/*
 			carga los clientes a partir del JSON guardado en local storage para ponerlos en el select
 			*/
@@ -147,12 +169,12 @@
 			
 			htmlTxt +="<option value=\"\">";				
 			htmlTxt += "Seleccione...</option>";
-			$.each(clientes['clientes'],function(i,elem){
+			$.each(clientes['clientes'],function(i,elem){ //Se crea la lista de clientes desde el localStore
 				htmlTxt +="<option value=\""+elem['idCliente']+"\">";				
 				htmlTxt += ""+elem['nombre']+"</option>";					
 			});
 			
-			$("#clienteSelect").html(htmlTxt);
+			$("#clienteSelect").html(htmlTxt);//Se asigna al select correspondiente
 			/*
 			Fin carga de cliente
 			**********************************************************
@@ -160,7 +182,7 @@
 			*/
 			
 			/*
-			Función para cargar datos del cliente cargado
+			Función para cargar datos del cliente seleccionado en <SELECT>
 			*/
 			$("#clienteSelect").change(function(){
 				
@@ -176,7 +198,9 @@
 				{
 					myJSONObject = JSON.parse(""+atr);	
 				}
-				
+				/*
+				Se arma el html de la tabla que contendrá los datos del cliente, se crea la tabla completa para poder inicializar el widget de la tabla de jquery mobile
+				*/
 				htmlTxt = ' <table data-role="table" id="table-column-toggle-clientes" data-mode="columntoggle" class="ui-responsive table-stroke">';
         		htmlTxt += '<thead>';
                 htmlTxt += '<tr>';
@@ -199,6 +223,9 @@
             	htmlTxt += '</thead>';
             	htmlTxt += '<tbody id="myCliente">';
             	
+				/*
+					Se busca en el json el cliente seleccionado y se cargan sus datos en la tabla creada
+				*/
 				$.each(myJSONObject['clientes'],function(i,elem){
 					console.log(i);
 					if($("#clienteSelect").val() == elem['idCliente'])
@@ -239,28 +266,60 @@
 				productos = JSON.parse(""+atr);	
 			}
 			
-			
+			//Se llena el <select> de productos con el localStorage
 			htmlTxt +="<option value=\"\">";				
 			htmlTxt += "Seleccione...</option>";
 			$.each(productos['productos'],function(i,elem){
-				htmlTxt +="<option data-count=\""+i+"\" data-cost=\""+elem['precio']+"\" value=\""+elem['idProducto']+"\">";				
+				htmlTxt +="<option data-count=\""+i+"\" data-costMayor=\""+elem['precioMayoreo']+"\" data-unidad=\""+elem['unidad']+"\" data-cost=\""+elem['precio']+"\" value=\""+elem['idProducto']+"\" data-conversiones=\""+elem['conversiones']+"\">";				
 				htmlTxt += ""+elem['nombre']+"</option>";					
 			});
 			
 			$(".selectProducto").html(htmlTxt);
 			
+			/*
+				Comportamiento del select de productos para cuando se selecciona un producto en específico
+				-se agrega cantidad 1
+				-se precarga el precio por unidad
+			*/
 			$(".selectProducto").change(function()
 			{
-				var idNum = $(this).prop("id").split("_")[0];
+				
+				var idNum = $(this).prop("id").split("_")[0]; //Cada select está numerado secuencialmente, se obtiene ese número secuencial que identificará a todos sus hermanos
 				//$(this).addClass("active");
 				//$(".selectProducto:not(.active) option[value='"+$(this).val()+"']").remove();	
 				//$(this).removeClass("active");
-				var auxElem = $(this).find("option:selected");
-				$("#"+idNum+"_precioU").val(auxElem.data("cost"));
-				$("#"+idNum+"_cantidad").val("1");
-				$("#"+idNum+"_subtotal").html(auxElem.data("cost"));
-				recalculaTotal();
-				var i = auxElem.data("count");
+				var auxElem = $(this).find("option:selected"); // Se obtiene el <option> seleccionado por el usuario
+				$("#"+idNum+"_precioU").val(auxElem.data("cost"));//Se obtiene el precio unitario del <option> seleccionado y se coloca en el input de precio
+				$("#"+idNum+"_cantidad").val("1");//Se coloca la cantidad de 1
+				//$("#"+idNum+"_cantidad").append(auxElem.data("unidad"));
+				$("#"+idNum+"_subtotal").html(auxElem.data("cost"));//Se calcula el subtotal
+				recalculaTotal();//Se calcula el total de la orden de compra
+				var i = auxElem.data("count");//número de identifica el número de <option> que se selecciono .. esto se usaba para borrar dicho <option> actualmente sólo se tiene por si se reconsidera esa opción.				
+				var unidades = ""; //Variable para guardar las diferentes unidad en las que se puede comprar el producto, ej. caja, bulto, saco, etc.
+				unidades += "<option value=\"1\" selected=\"selected\">"+auxElem.data("unidad")+"</option>"; //Se crea el valor de conversión para la unidad inicial en la que se definió al producto... generalmente nombradas como pieza o unidad, unidad básica.. y a este se le da el valor de 1
+				if(auxElem.data("conversiones") != "")//Si existen conversiones
+				{
+					
+					var arrConver = null;//donde vamos a guardar el split de la string de conversiones
+					arrConver = auxElem.data("conversiones").split(":::");
+					/*
+					La estructura de las conversiones es:
+					
+					idUnidad1||nombreUnidad1||ValorDeConversiónDeUnidad1:::idUnidad2||nombreUnidad2||ValorDeConversiónDeUnidad2
+					
+					*/
+					
+					$.each(arrConver,function(i,elem)//por cada conversion encontrada se anexa a la string que conformará el html
+					{
+						var auxConver = elem.split("||");
+						unidades += "<option data-unidadid=\""+auxConver[0]+"\"value=\""+auxConver[2]+"\">"+auxConver[1]+"</option>";
+						
+					});
+				}
+				
+				$("#"+idNum+"_unidad").html(unidades);//se anexa el html al <select> de unidades
+				$("#"+idNum+"_unidad").parent().find("span").html(auxElem.data("unidad"));//Se coloca en el span de la interfaz el nombre de la unidad inicial
+				
 				//console.log(productos['productos']);
 				//delete (productos['productos'][i]);
 				//console.log(productos['productos']);
@@ -268,35 +327,47 @@
 			
 			
 			
-			var countProductos=3;
+			var countProductos=3;//Contador para identificar el número de productos agregados, por default se tienen agregados 2 <tr> con información de productos
+			
+			/*
+				Agrega nuevo <tr> a la tabla para capturar un nuevo producto
+			*/
 			function addProducto()
 			{
 				var html = "";
 				
 					
 					html += '<tr>';
-                    html += '<td class="ui-table-priority-2">';
+                    html += '<td class="ui-table-priority-1">';
                     html += '    <div class="ui-select"><div id="'+countProductos+'_producto-button" class="ui-btn ui-icon-carat-d ui-btn-icon-right ui-corner-all ui-shadow"><span class="selectProducto">Seleccione...</span><select name="'+countProductos+'_producto" id="'+countProductos+'_producto" class="selectProducto cargarProductos"></select></div></div>                    ';
                     html += '</td>';
-                   	html += ' <td class="ui-table-priority-1">';
+                   	html += ' <td class="ui-table-priority-2">';
                   	html += '     <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset"><input type="number" name="'+countProductos+'_cantidad" id="'+countProductos+'_cantidad" max="99999999" min="1" placeholder="CANTIDAD" class="cantidad cargarCantidad"></div>';
                     html += '</td>';
-                    html += ' <td class="ui-table-priority-3">';
-                    html += '    <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset"><input type="number" name="'+countProductos+'_precioU" id="'+countProductos+'_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU cargarPrecioU"></div>';
+					 html += '<td class="ui-table-priority-3">';
+                    html += '   <select name="'+countProductos+'_unidad" id="'+countProductos+'_unidad" class="selectUnidad cargaUnidad"></select>   ';
                     html += '</td>';
-                    html += '<td class="ui-table-priority-4">';
+                    html += ' <td class="ui-table-priority-4">';
+                    html += '    <div class="ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset"><input type="number" name="'+countProductos+'_precioU" id="'+countProductos+'_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU cargarPrecioU" readonly=\"readonly\" /></div>';
+                    html += '</td>';
+                    html += '<td class="ui-table-priority-5">';
                     html += '	<div id="'+countProductos+'_subtotal" class="subtotal"></div>';
                     html += '</td>';
                 	html += '</tr>';
 					//$("#table-column-toggle-productos").remove();
 					$("#productosOC").append(html);
+					
 					countProductos++;					
 					cargaProductosSelect();
 					//$("#table-column-toggle-productos");
 			}
 			
+			/*
+				Llena el <select> de productos
+			*/
 			function cargaProductosSelect()
 			{
+				console.log("cps 1");
 				var htmlSelect = "";
 				htmlSelect +="<option value=\" \">";				
 				htmlSelect += "Seleccione...</option>";
@@ -306,11 +377,12 @@
 							return;	  
 						}else
 						{							
-							htmlSelect +="<option data-count=\""+i+"\" data-cost=\""+elem['precio']+"\" value=\""+elem['idProducto']+"\">";				
+							htmlSelect +="<option data-count=\""+i+"\" data-cost=\""+elem['precio']+"\" data-costMayor=\""+elem['precioMayoreo']+"\" data-unidad=\""+elem['unidad']+"\" value=\""+elem['idProducto']+"\" data-conversiones=\""+elem['conversiones']+"\">";				
 							htmlSelect += ""+elem['nombre']+"</option>";
 						}
 					}); 	
 				$(".cargarProductos").html(htmlSelect);
+				console.log("prepareS 1");
 				prepareSelect();
 			}
 			
@@ -318,10 +390,25 @@
 				try
 				{
 					var idActual = $(this).prop("id").split("_")[0];
-					var cantidad=$(this).val();
+					var cantidad=parseFloat($(this).val());
+					var unidad = parseFloat($("#"+idActual+"_unidad").val());
+					cantidad = unidad * cantidad;
+					
 					if(cantidad == "" || typeof cantidad == typeof undefined || cantidad == null)
 					{
 						cantidad = 0;	
+					}
+					//console.log(cantidad+" ** "+MAYOREO);
+					if(cantidad >= MAYOREO)
+					{
+						selectP = null;
+						selectP = $("#"+idActual+"_producto").find("option:selected");						
+						$("#"+idActual+"_precioU").val(selectP.data('costmayor'));	
+					}else
+					{
+						selectP = null;
+						selectP = $("#"+idActual+"_producto").find("option:selected");						
+						$("#"+idActual+"_precioU").val(selectP.data('cost'));	
 					}
 					var precioU = $("#"+idActual+"_precioU").val();
 					if(precioU == "" || typeof precioU == typeof undefined || precioU == null)
@@ -340,6 +427,8 @@
 				{
 					var idActual = $(this).prop("id").split("_")[0];
 					var cantidad=$("#"+idActual+"_cantidad").val();
+					var unidad = parseFloat($("#"+idActual+"_unidad").val());
+					cantidad = unidad * cantidad;
 					if(cantidad == "" || typeof cantidad == typeof undefined || cantidad == null)
 					{
 						cantidad = 0;	
@@ -356,9 +445,45 @@
 				}catch(err){}
 			});
 			
+			$(".selectUnidad").change(function(){
+				try
+				{
+					var idActual = $(this).prop("id").split("_")[0];
+					var cantidad=$("#"+idActual+"_cantidad").val();
+					var unidad = parseFloat($(this).val());
+					cantidad = unidad * cantidad;
+					if(cantidad == "" || typeof cantidad == typeof undefined || cantidad == null)
+					{
+						cantidad = 0;	
+					}
+					if(cantidad >= MAYOREO)
+					{
+						selectP = null;
+						selectP = $("#"+idActual+"_producto").find("option:selected");						
+						$("#"+idActual+"_precioU").val(selectP.data('costmayor'));	
+					}else
+					{
+						selectP = null;
+						selectP = $("#"+idActual+"_producto").find("option:selected");						
+						$("#"+idActual+"_precioU").val(selectP.data('cost'));	
+					}
+					
+					//console.log(cantidad+" ** "+MAYOREO);
+					var precioU = $("#"+idActual+"_precioU").val();
+					if(precioU == "" || typeof precioU == typeof undefined || precioU == null)
+					{
+						precioU = 0;	
+					}
+					
+					var subtotal = parseFloat(cantidad)*parseFloat(precioU);
+					$("#"+idActual+"_subtotal").html(subtotal.toFixed(2));
+					recalculaTotal();
+				}catch(err){}
+			});
+			
 			function recalculaTotal()
 			{
-				console.log("recalcula");
+				//console.log("recalcula");
 				try
 				{
 					var total = 0;
@@ -373,15 +498,17 @@
 						
 						total += parseFloat(val);
 					});
-					console.log("total: "+total); 
+					//console.log("total: "+total); 
 					$("#totalOC").html("$"+total.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,'));
 				}catch(err){}
 			}
 			
 			function prepareSelect()
 			{
+				
 				$(".cargarProductos").unbind("change").change(function()
 					{
+												
 						var idNum = $(this).prop("id").split("_")[0];
 						$(this).parent().find("span").html($(this).find("option:selected").html());
 						//$(this).addClass("active");
@@ -390,19 +517,40 @@
 						var auxElem = $(this).find("option:selected");
 						$("#"+idNum+"_precioU").val(auxElem.data("cost"));
 						$("#"+idNum+"_cantidad").val("1");
-						$("#"+idNum+"_subtotal").html(auxElem.data("cost"));
-						recalculaTotal();
-						var i = auxElem.data("count");
+						$("#"+idNum+"_subtotal").html(auxElem.data("cost"));						
+						recalculaTotal();						
+						var i = auxElem.data("count");						
+						var unidades = "";
+						unidades += "<option data-conversion=\"1\" selected=\"selected\">"+auxElem.data("unidad")+"</option>";					
+							
+						if(auxElem.data("conversiones") != "")
+						{							
+							var arrConver = null;
+							arrConver = auxElem.data("conversiones").split(":::");
+							
+							$.each(arrConver,function(i,elem)
+							{
+								var auxConver = elem.split("||");
+								unidades += "<option data-unidadid=\""+auxConver[0]+"\"value=\""+auxConver[2]+"\">"+auxConver[1]+"</option>";
+								
+							});
+						}
+						
+						$("#"+idNum+"_unidad").html(unidades);
+						$("#"+idNum+"_unidad").parent().find("span").html(auxElem.data("unidad"));
+						$("#"+idNum+"_unidad").selectmenu();
 						//console.log(productos['productos']);
 						//delete (productos['productos'][i]);
 						//console.log(productos['productos']);
 					});
-					$(".cargarProductos").removeClass(".cargarProductos");
+					$(".cargarProductos").removeClass("cargarProductos");
 					$(".cargarCantidad").keyup(function(){
 					try
 					{
 						var idActual = $(this).prop("id").split("_")[0];
 						var cantidad=$(this).val();
+						var unidad = parseFloat($("#"+idActual+"_unidad").val());
+						cantidad = unidad * cantidad;
 						if(cantidad == "" || typeof cantidad == typeof undefined || cantidad == null)
 						{
 							cantidad = 0;	
@@ -418,12 +566,14 @@
 						recalculaTotal();
 					}catch(err){}
 				});
-				$(".cargarCantidad").removeClass(".cargarCantidad");
+				$(".cargarCantidad").removeClass("cargarCantidad");
 				$(".cargarPrecioU").keyup(function(){
 					try
 					{
 						var idActual = $(this).prop("id").split("_")[0];
 						var cantidad=$("#"+idActual+"_cantidad").val();
+						var unidad = parseFloat($("#"+idActual+"_unidad").val());
+						cantidad = unidad * cantidad;
 						if(cantidad == "" || typeof cantidad == typeof undefined || cantidad == null)
 						{
 							cantidad = 0;	
@@ -439,7 +589,30 @@
 						recalculaTotal();
 					}catch(err){}
 				});
-				$(".cargarPrecioU").removeClass(".cargarPrecioU");
+				$(".cargarPrecioU").removeClass("cargarPrecioU");
+				$(".cargaUnidad").unbind("change").change(function(){
+					try
+					{
+						var idActual = $(this).prop("id").split("_")[0];
+						var cantidad=$("#"+idActual+"_cantidad").val();
+						var unidad = parseFloat($(this).val());
+						cantidad = unidad * cantidad;
+						if(cantidad == "" || typeof cantidad == typeof undefined || cantidad == null)
+						{
+							cantidad = 0;	
+						}
+						var precioU = $("#"+idActual+"_precioU").val();
+						if(precioU == "" || typeof precioU == typeof undefined || precioU == null)
+						{
+							precioU = 0;	
+						}
+						
+						var subtotal = parseFloat(cantidad)*parseFloat(precioU);
+						$("#"+idActual+"_subtotal").html(subtotal.toFixed(2));
+						recalculaTotal();
+					}catch(err){}
+				});
+				$(".cargaUnidad").removeClass("cargaUnidad");
 			}
 		
 		var todobien = true;

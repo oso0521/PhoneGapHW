@@ -61,12 +61,21 @@
         <script>
 			var BASE_JSON={"productos":[{}]};
 			$.getJSON( "http://dulceriabombon.movitbe.com/getProductos.php", function( data ) {
-			 //console.log(data['Clientes']);
-			 BASE_JSON['productos'] = data['Productos'];
-			 console.log(BASE_JSON);
-			 window.localStorage.setItem("Productos",JSON.stringify(BASE_JSON) );
-			 			  
+				 //console.log(data['Clientes']);
+				 BASE_JSON['productos'] = data['Productos'];
+				 console.log(BASE_JSON);
+				 window.localStorage.setItem("Productos",JSON.stringify(BASE_JSON) );
+					BASE_JSON={"clientes": [{}]};
+				$.getJSON( "http://dulceriabombon.movitbe.com/getClientes.php", function( data ) {
+					 //console.log(data['Clientes']);
+					 BASE_JSON['clientes'] = data['Clientes'];
+					 console.log(BASE_JSON);
+					 window.localStorage.setItem("Clientes",JSON.stringify(BASE_JSON) );
+							  
+				});		  
 			});
+			
+			
 		</script>
     </head>
     <body>
