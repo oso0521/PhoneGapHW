@@ -1,0 +1,118 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Dulcer&iacute;a Bomb&oacute;n Pto. Es.</title>
+	<link rel="stylesheet" href="jquery-mobile/jquery.mobile-1.4.2.min.css">
+	
+	<link rel="shortcut icon" href="../favicon.ico">
+	<script src="jquery-mobile/jquery.js"></script>
+	<script src="js/index.js"></script>
+	<script src="jquery-mobile/jquery.mobile-1.4.2.min.js"></script>
+</head>
+<body>
+	<style>
+		label
+		{
+			padding-left:10px;
+			font-weight:bold;
+			margin-top:10px;		
+		}
+		
+		.red
+		{
+			background-color:#C00 !important;
+			color:white !important;
+			font-weight:500 !important;
+		}		
+		
+		form
+		{
+			margin:10px;
+			padding:10px;			
+		}
+	</style>
+	<div data-role="header" data-theme="b">
+		<h1>Nuevo Cliente</h1>
+	</div><!-- /header -->
+	<form action="javscript:guardaCliente()" id="formCliente">    	
+        <label>
+        	Nombre
+        </label>
+        <input type="text" id="nombre" name="nombre" maxlength="250" />
+        <label>
+        	Localidad
+        </label>
+        <input type="text" id="localidad" name="localidad" />
+        <label>
+        	Direcci&oacute;n
+        </label>
+        <input type="text" id="direccion" name="direccion" />
+        <label>
+        	Referencia
+        </label>
+        <input type="text" id="referencia" name="referencia" />
+        <label>
+        	Tel&eacute;fono
+        </label>
+        <input type="tel" id="telefono" name="telefono" />
+           
+    </form>
+    <div style="width:100%; text-align:center;" id="popOC">
+            <a href="#popupLogin" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop" style="margin-left:auto; margin-right:auto;">Guardar</a>
+    <div data-role="popup" id="popupLogin" data-overlay-theme="b" data-theme="a" class="ui-corner-all">       
+        <div style="padding:10px 20px;">
+            <h3>¿Realmente desea guardar?</h3>
+           <a href="javascript:guardaCliente()" class="ui-btn ui-corner-all ui-btn-inline ui-btn-a" data-rel="back" data-transition="flow" onclick="guardaCliente()">Guardar</a>
+            <a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b" data-rel="back">Cancelar</a>
+        </div>
+    </div>
+    </div>
+    
+    <script>
+		function guardaCliente()
+		{
+			var params = $("#formCliente").serializeArray();
+			
+			var atr = localStorage.getItem("newClients");//Obtener el objeto "OC" ordenes de compra de Local Storage
+			var oldClients = localStorage.getItem("Clientes");				
+			
+			var htmlTxt = "";
+			
+			if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
+			{
+				myJSONObject ={"newClients":[]};
+			}else
+			{
+				myJSONObject = JSON.parse(""+atr);	
+			}
+			
+			if(oldClients== "" || oldClients == null || typeof oldClients == 'undefined')//Si nunca se ha creado, se crea con valores nulos
+			{
+				oldClientsObject ={"Clientes":[]};
+			}else
+			{
+				oldClientsObject = JSON.parse(""+oldClients);	
+			}
+			
+			console.log(oldClientsObject);
+			
+			var idClienteNuevo = myJSONObject['newClients'].length + 1;
+			
+			var myJSON = '{"idCliente":"n_'+idClienteNuevo+'","nombre":"'+params[0].value+'","localidad":"'+params[1].value+'","direccion":"'+params[2].value+'","referencia":"'+params[3].value+'","telefono":"'+params[4].value+'"}';
+			
+			
+			
+			
+			myJSONObject['newClients'].push($.parseJSON(myJSON));			
+			oldClientsObject['clientes'].push($.parseJSON(myJSON));
+			
+			window.localStorage.setItem("newClients",JSON.stringify(myJSONObject) );
+			window.localStorage.setItem("Clientes",JSON.stringify(oldClientsObject) );
+			$("#popOC").html("Guardado correctamente");
+			window.location = "formCliente.html";			
+		}
+	</script>
+</body>
+</html>

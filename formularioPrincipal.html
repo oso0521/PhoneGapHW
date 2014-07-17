@@ -129,7 +129,7 @@
         <div id="errorMessage"></div>
         <div style="width:100%; text-align:center;" id="popOC">
             <a href="#popupLogin" data-rel="popup" data-position-to="window" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-check ui-btn-icon-left ui-btn-a" data-transition="pop" style="margin-left:auto; margin-right:auto;">Guardar</a>
-    <div data-role="popup" id="popupLogin" data-overlay-theme="b" data-theme="a" class="ui-corner-all">
+    	<div data-role="popup" id="popupLogin" data-overlay-theme="b" data-theme="a" class="ui-corner-all">
        
             <div style="padding:10px 20px;">
                 <h3>¿Realmente desea guardar?</h3>
@@ -162,6 +162,11 @@
 			htmlTxt +="<option value=\"\">";				
 			htmlTxt += "Seleccione...</option>";
 			$.each(clientes['clientes'],function(i,elem){ //Se crea la lista de clientes desde el localStore
+				console.log(typeof elem['nombre']);
+				if(elem['nombre'] == "" || typeof elem['nombre'] == typeof undefined || elem['nombre'] == 'undefined' )
+				{
+					return;	
+				}
 				htmlTxt +="<option value=\""+elem['idCliente']+"\">";				
 				htmlTxt += ""+elem['nombre']+"</option>";					
 			});
@@ -262,7 +267,7 @@
 			htmlTxt +="<option value=\"\">";				
 			htmlTxt += "Seleccione...</option>";
 			$.each(productos['productos'],function(i,elem){
-				htmlTxt +="<option data-count=\""+i+"\" data-costMayor=\""+elem['precioMayoreo']+"\" data-unidad=\""+elem['unidad']+"\" data-cost=\""+elem['precio']+"\" value=\""+elem['idProducto']+"\" data-conversiones=\""+elem['conversiones']+"\">";				
+				htmlTxt +="<option data-count=\""+i+"\" data-costMayor=\""+elem['precioMayoreo']+"\" data-unidadid=\""+elem['idUnidad']+"\" data-unidad=\""+elem['unidad']+"\" data-cost=\""+elem['precio']+"\" value=\""+elem['idProducto']+"\" data-conversiones=\""+elem['conversiones']+"\">";				
 				htmlTxt += ""+elem['nombre']+"</option>";					
 			});
 			
@@ -288,7 +293,7 @@
 				recalculaTotal();//Se calcula el total de la orden de compra
 				var i = auxElem.data("count");//número de identifica el número de <option> que se selecciono .. esto se usaba para borrar dicho <option> actualmente sólo se tiene por si se reconsidera esa opción.				
 				var unidades = ""; //Variable para guardar las diferentes unidad en las que se puede comprar el producto, ej. caja, bulto, saco, etc.
-				unidades += "<option value=\"1\" selected=\"selected\">"+auxElem.data("unidad")+"</option>"; //Se crea el valor de conversión para la unidad inicial en la que se definió al producto... generalmente nombradas como pieza o unidad, unidad básica.. y a este se le da el valor de 1
+				unidades += "<option value=\"1\" data-unidadid=\""+auxElem.data("unidadid")+"\" selected=\"selected\">"+auxElem.data("unidad")+"</option>"; //Se crea el valor de conversión para la unidad inicial en la que se definió al producto... generalmente nombradas como pieza o unidad, unidad básica.. y a este se le da el valor de 1
 				if(auxElem.data("conversiones") != "")//Si existen conversiones
 				{
 					
@@ -521,7 +526,7 @@
 						recalculaTotal();						
 						var i = auxElem.data("count");						
 						var unidades = "";
-						unidades += "<option data-conversion=\"1\" selected=\"selected\">"+auxElem.data("unidad")+"</option>";					
+						unidades += "<option value=\"1\" data-unidadid=\""+auxElem.data("unidadid")+"\" selected=\"selected\">"+auxElem.data("unidad")+"</option>";					
 							
 						if(auxElem.data("conversiones") != "")
 						{							
@@ -645,7 +650,7 @@
 				{
 					if(countProductosActivos++>0)
 						myJSON += ",";
-					myJSON += '{"idProducto":"'+$(this).val()+'","cantidad":"'+$("#"+id+"_cantidad").val()+'","precioUnitario":"'+$("#"+id+"_precioU").val()+'"}';
+					myJSON += '{"idProducto":"'+$(this).val()+'","cantidad":"'+$("#"+id+"_cantidad").val()+'","precioUnitario":"'+$("#"+id+"_precioU").val()+'","idUnidad":"'+$("#"+id+'_unidad').find("option:selected").data("unidadid")+'"}';
 				}
 				}catch(err){console.log(err)}
 			});
@@ -677,6 +682,7 @@
 			var atr = localStorage.getItem("OC");//Obtener el objeto "OC" ordenes de compra de Local Storage
 			
 			var htmlTxt = "";
+			
 			if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
 			{
 				myJSONObject ={"oc":[{}]};
@@ -684,6 +690,7 @@
 			{
 				myJSONObject = JSON.parse(""+atr);	
 			}
+			
 			myJSONObject['oc'].push($.parseJSON(myJSON));
 			
 			//console.log(myJSONObject);

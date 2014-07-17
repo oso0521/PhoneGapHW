@@ -87,9 +87,10 @@
 		function sincroniza()
 		{
 			var atr = localStorage.getItem("OC");//Obtener el objeto "BD" de Local Storage
+			var cli = localStorage.getItem("newClients");
 			var htmlTxt = "";
 			
-			if(atr== "" || atr == null || typeof atr == 'undefined')//Si nunca se ha creado, se crea con valores nulos
+			if((atr== "" || atr == null || typeof atr == 'undefined') && ( cli == "" || cli == null || typeof cli == 'undefined'))//Si nunca se ha creado, se crea con valores nulos
 			{
 				$("#ocBody").html('<tr><td colspan="2"><h2>No existen ordenes de compra</h2></td></tr>');
 				return;
@@ -102,7 +103,7 @@
 					$("#ocBody").html('<tr><td colspan="2"><h2>No existen &oacute;rdenes de compra</h2></td></tr>');
 					return;	
 				}	
-				$.post("http://dulceriabombon.movitbe.com/guardaOC.php","oc="+atr,function(e){
+				$.post("http://dulceriabombon.movitbe.com/guardaOC.php","oc="+atr+"&clientes="+cli,function(e){
 					try
 					{
 						if(parseInt(e.split(":::")[0]) == 1)
@@ -110,6 +111,16 @@
 							$("#msgSincro").html(e.split(":::")[1]);
 							myJSONObject ={"oc":[{}]};
 							window.localStorage.setItem("OC",JSON.stringify(myJSONObject) );
+							BASE_JSON={"clientes": [{}]};
+							$.getJSON( "http://dulceriabombon.movitbe.com/getClientes.php", function( data ) {
+								 //console.log(data['Clientes']);
+								 if(data != "" && data != null )
+									 BASE_JSON['clientes'] = data['Clientes'];								 
+								 window.localStorage.setItem("Clientes",JSON.stringify(BASE_JSON) );
+								 var nc = {"newClients":[]};
+								 window.localStorage.setItem("newClients",JSON.stringify(nc));
+										  
+							});		
 							cargaTabla();	
 						}else
 						{
