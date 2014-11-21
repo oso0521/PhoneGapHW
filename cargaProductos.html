@@ -74,6 +74,15 @@
 						 BASE_JSON['clientes'] = data['Clientes'];
 					 console.log(BASE_JSON);
 					 window.localStorage.setItem("Clientes",JSON.stringify(BASE_JSON) );
+					 BASE_JSON={"rutas": [{}]};
+					$.getJSON( "http://dulceriabombon.movitbe.com/getRutas.php", function( data ) {
+						 //console.log(data['Clientes']);
+						 if(data != "" && data != null )
+							 BASE_JSON['rutas'] = data['Rutas'];
+						 console.log(BASE_JSON);
+						 window.localStorage.setItem("Rutas",JSON.stringify(BASE_JSON) );
+								  
+					});	
 							  
 				});		  
 			});

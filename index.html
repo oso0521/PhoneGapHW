@@ -76,22 +76,19 @@
 		<table data-role="table" id="table-column-toggle-clientes" data-mode="columntoggle" class="ui-responsive table-stroke">
         	<thead>
                 <tr>
-                    <th data-priority="3">
+                    <th data-priority="2">
                     	#
                     </th>
                     <th data-priority="1">
                     	Nombre
                     </th>
-                     <th data-priority="2">
-                    	Contacto
-                    </th>
-                    <th data-priority="4">
+                    <th data-priority="3">
                     	Localidad
                     </th>
-                    <th data-priority="5">
+                    <th data-priority="4">
                     	Referencia
                     </th>
-                    <th data-priority="6">
+                    <th data-priority="5">
                     	Tel&eacute;fono
                     </th>                    
                 </tr>
@@ -116,7 +113,6 @@
 			$.each(myJSONObject['clientes'],function(i,elem){
 				htmlTxt +="<tr>";
 				htmlTxt += "<td>"+elem['numero']+"</td>";
-				htmlTxt += "<td>"+elem['nombreAbarrote']+"</td>";
 				htmlTxt += "<td>"+elem['nombre']+"</td>";
 				htmlTxt += "<td>"+elem['localidad']+"</td>";
 				htmlTxt += "<td>"+elem['referencia']+"</td>";
@@ -142,7 +138,7 @@
 	</div><!-- /header -->
 
 	<div role="main" class="ui-content" data-theme="b">
-		<h2>Productos descargados al dispositivo</h2>
+		<h2>Clientes descargados al dispositivo</h2>
 		<table data-role="table" id="table-column-toggle-productos" data-mode="columntoggle" class="ui-responsive table-stroke">
         	<thead>
                 <tr>

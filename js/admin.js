@@ -1,36 +1,24 @@
-var BASE_JSON={"clientes": [{}], "productos":[{}]};
-
-function getClients()
+function getProductosABC()
 {
-	var atr = localStorage.getItem("car");
-		if(atr== "" || atr == null || typeof atr == 'undefined')
-		{
-			myJSONObject ={"canciones": [{}], "albums":[{}]};
-		}else
-		{
-			myJSONObject = JSON.parse(""+atr);	
-		}
-		
-		$.each(myJSONObject['canciones'],function(i,elem)
-		{
-			if(elem.id == id)
-			{
-				todobien = false;
-				return;	
-			}
-		});
-		
-		if(!todobien)
-		{
-			console.log("Elemento repetido");
-			return;	
-		}
-		var len = myJSONObject.canciones.length -1;		
-		myJSONObject['canciones'].push({"id":id});		
-		window.localStorage.setItem("car",JSON.stringify(myJSONObject) );
-		$("#cuentaCarrito").html((myJSONObject.canciones.length-1+myJSONObject.albums.length-1));		
-		/*$.each(myJSONObject['canciones'],function(i,elem)
-		{			
-			console.log(elem.id);
-		});	*/		
+	abc_table("Producto","headers:idProducto-Id,idUnidad-Unidad,idProveedor-Proveedor|fk_idUnidad:nombre|fk_idProveedor:nombre","contenido");	
+}
+
+function getProveedoresABC()
+{
+	abc_table("Proveedor","","contenido");	
+}
+
+function getClientesABC()
+{
+	abc_table("Cliente","fk_idRuta:nombre|fk_idPromotor:nombre","contenido");	
+}
+
+function getPromotoresABC()
+{
+	abc_table("Promotor","","contenido");	
+}
+
+function getConversionABC()
+{
+	abc_table("Conversion","fk_unidad1:nombre|fk_unidad2:nombre|headers:unidad1-De,unidad2-A,conversion-Cantidad","contenido");	
 }
