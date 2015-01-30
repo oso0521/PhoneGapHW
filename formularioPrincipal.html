@@ -38,6 +38,24 @@
 		width:120px !important;		
 	}
 	
+	.ui-selectmenu.ui-popup .ui-input-search {
+		margin-left: .5em;
+		margin-right: .5em;
+	}
+	.ui-selectmenu.ui-dialog .ui-content {
+		padding-top: 0;
+	}
+	.ui-selectmenu.ui-dialog .ui-selectmenu-list {
+		margin-top: 0;
+	}
+	.ui-selectmenu.ui-popup .ui-selectmenu-list li.ui-first-child .ui-btn {
+		border-top-width: 1px;
+		-webkit-border-radius: 0;
+		border-radius: 0;
+	}
+	.ui-selectmenu.ui-dialog .ui-header {
+		border-bottom-width: 1px;
+	}
 </style>
 	<div data-role="header" data-theme="b">
 		<h1>Nueva Orden de Compra</h1>
@@ -48,7 +66,10 @@
         </h2>
         <select name="rutaSelect" id="rutaSelect" required="required" class="requerido"></select>
     	<h2>Seleccione Cliente:</h2>
-        <select name="clienteSelect" id="clienteSelect" required="required" class="requerido"></select>
+        <!--<select name="clienteSelect" id="clienteSelect" required="required" class="requerido"></select>-->
+		<!--<input type="text" data-type="search" id="clienteSelect"/>-->
+		<select id="clienteSelect" data-native-menu="false">
+		</select>
        	<div id="tablaClientes">
         </div>
     	<h2>
@@ -80,10 +101,12 @@
             <tbody id="productosOC">
             	<tr>
                     <td>
-                        <select name="1_producto" id="1_producto" class="selectProducto">
+						<div>
+                        <select name="1_producto" id="1_producto" class="selectProducto" data-native-menu="false">
                         </select>                    
+						</div>
                     </td>
-                    <td >
+                    <td class="inputContainer">
                         <input type="number" name="1_cantidad" id="1_cantidad" max="99999999" min="1" placeholder="CANTIDAD" class="cantidad" />
                     </td>
                     <td>
@@ -93,14 +116,16 @@
                     <td >
                         <input type="number" name="1_precioU" id="1_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU" readonly="readonly" />
                     </td>
-                    <td>
+                    <td class="inputContainer">
                     	<div id="1_subtotal" class="subtotal"></div>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <select name="2_producto" id="2_producto" class="selectProducto">
+						<div>
+                        <select name="2_producto" id="2_producto" class="selectProducto"  data-native-menu="false">
                         </select>                    
+						</div>
                     </td>
                     <td class="inputContainer">
                         <input type="number" name="2_cantidad" id="2_cantidad" max="99999999" min="1" placeholder="CANTIDAD" class="cantidad" />
@@ -143,8 +168,7 @@
    
 </div>
         
-    </form>
-   
+    </form>   		
     <script>
 			var MAYOREO = 50; //Numero de elementos para que se considere mayoreo
 			/*
@@ -165,6 +189,7 @@
 			
 			htmlTxt +="<option value=\"\">";				
 			htmlTxt += "Seleccione...</option>";
+			
 			$.each(rutas['rutas'],function(i,elem){ //Se crea la lista de clientes desde el localStore
 				console.log(typeof elem['nombre']);
 				if(elem['nombre'] == "" || typeof elem['nombre'] == typeof undefined || elem['nombre'] == 'undefined' )
@@ -172,7 +197,8 @@
 					return;	  
 				}
 				htmlTxt +="<option value=\""+elem['idRuta']+"\">";				
-				htmlTxt += ""+elem['nombre']+"</option>";					
+				htmlTxt += ""+elem['nombre']+"</option>";	
+								
 			});
 			
 			$("#rutaSelect").html(htmlTxt);//Se asigna al select correspondiente
@@ -207,9 +233,10 @@
 				clientes = JSON.parse(""+atr);	
 			}
 			
-			
-			htmlTxt +="<option value=\"\">";				
+			htmlTxt +="<option value=\" \">";				
 			htmlTxt += "Seleccione...</option>";
+			
+			var listaClientes = [];
 			$.each(clientes['clientes'],function(i,elem){ //Se crea la lista de clientes desde el localStore
 				console.log(typeof elem['nombre']);
 				if(elem['nombre'] == "" || typeof elem['nombre'] == typeof undefined || elem['nombre'] == 'undefined' )
@@ -217,10 +244,17 @@
 					return;	
 				}
 				htmlTxt +="<option value=\""+elem['idCliente']+"\">";				
-				htmlTxt += ""+elem['nombreAbarrote']+"</option>";					
+				htmlTxt += ""+elem['nombreAbarrote']+"</option>";
+				
+				var newClient = {label:elem['nombreAbarrote'],value:elem['idCliente']};
+				listaClientes[listaClientes.length] = newClient;					
 			});
 			
-			$("#clienteSelect").html(htmlTxt);//Se asigna al select correspondiente
+			$("#clienteSelect").html(htmlTxt);
+			iniciaAutocomplete("clienteSelect");
+			
+			
+			//Se asigna al select correspondiente
 			/*
 			Fin carga de cliente
 			**********************************************************
@@ -299,8 +333,8 @@
 			});
 			
 			/****************************************************************************
-			******************************  FIN CHANGE CLIENTE ***************************
-			******************************************************************************/
+			****************************** FIN CHANGE CLIENTE ***************************
+			*****************************************************************************/
 			/*
 				Manejo de Productos
 			*/
@@ -325,6 +359,8 @@
 			});
 			
 			$(".selectProducto").html(htmlTxt);
+			
+			
 			
 			/*
 				Comportamiento del select de productos para cuando se selecciona un producto en específico
@@ -389,15 +425,15 @@
 					
 					html += '<tr>';
 			                    html += '<td class="ui-table-priority-1">';
-			                    html += '   <select name="'+countProductos+'_producto" id="'+countProductos+'_producto" class="selectProducto cargarProductos"></select>                    ';
-			                    html += '</td>';
+			                    html += '   <select name="'+countProductos+'_producto" id="'+countProductos+'_producto" class="selectProducto cargarProductos"  data-native-menu="false"></select>                    ';
+			                    html += '</td class="inputContainer">';
 			                   	html += ' <td class="ui-table-priority-2">';
 			                  	html += '    <input type="number" name="'+countProductos+'_cantidad" id="'+countProductos+'_cantidad" max="99999999" min="1" placeholder="CANTIDAD" class="cantidad cargarCantidad">';
 			                    html += '</td>';
 								 html += '<td class="ui-table-priority-3">';
 			                    html += '   <select name="'+countProductos+'_unidad" id="'+countProductos+'_unidad" class="selectUnidad cargaUnidad"></select>   ';
 			                    html += '</td>';
-			                    html += ' <td class="ui-table-priority-4">';
+			                    html += ' <td class="ui-table-priority-4" inputContainer>';
 			                    html += '    <input type="number" name="'+countProductos+'_precioU" id="'+countProductos+'_precioU" max="99999999" min="1" placeholder="PRECIO U" class="precioU cargarPrecioU" readonly=\"readonly\" />';
 			                    html += '</td>';
 			                    html += '<td class="ui-table-priority-5">';
@@ -406,6 +442,8 @@
 			                	html += '</tr>';
 					//$("#table-column-toggle-productos").remove();
 					$("#productosOC").append(html);
+					
+					iniciaAutocomplete(countProductos+"_producto");
 					
 					countProductos++;					
 					cargaProductosSelect();
@@ -774,6 +812,41 @@
 		{
 			$("#formOC").submit();	
 		}
+		
+		function iniciaAutocomplete(id)
+		{
+			console.log("initialize ac " + id);
+			$.mobile.document
+			.on( "listviewcreate", "#"+id+"-menu", function( e ) {
+				var input,
+					listbox = $( "#"+id+"-listbox" ),
+					form = listbox.jqmData( "filter-form" ),
+					listview = $( e.target );
+				if(!form) 
+				{
+					input = $( "<input data-type='search'></input>" );
+					form = $( "<form></form>" ).append( input );
+					input.textinput();
+					$( "#"+id+"-listbox" )
+						.prepend( form )
+						.jqmData( "filter-form", form );
+				}
+				listview.filterable({ input: input });
+			})
+			.on( "pagebeforeshow pagehide", "#"+id+"-dialog", function( e ) {
+				var form = $( "#"+id+"-listbox" ).jqmData( "filter-form" ),
+					placeInDialog = ( e.type === "pagebeforeshow" ),
+					destination = placeInDialog ? $( e.target ).find( ".ui-content" ) : $( "#"+id+"-listbox" );
+				form
+					.find( "input" )
+					.textinput( "option", "inset", !placeInDialog )
+					.end()
+					.prependTo( destination );
+			});
+		}
+		
+		iniciaAutocomplete("1_producto");
+		iniciaAutocomplete("2_producto");
 	</script>
     
     

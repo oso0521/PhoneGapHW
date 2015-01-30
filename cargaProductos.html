@@ -65,7 +65,7 @@
 				if(data != "" && data != null )
 					BASE_JSON['productos'] = data['Productos'];
 				console.log(BASE_JSON);
-				 
+				
 				window.localStorage.setItem("Productos",JSON.stringify(BASE_JSON) );
 				BASE_JSON={"clientes": [{}]};
 				$.getJSON( "http://dulceriabombon.movitbe.com/getClientes.php", function( data ) {
@@ -80,10 +80,8 @@
 						 if(data != "" && data != null )
 							 BASE_JSON['rutas'] = data['Rutas'];
 						 console.log(BASE_JSON);
-						 window.localStorage.setItem("Rutas",JSON.stringify(BASE_JSON) );
-								  
+						 window.localStorage.setItem("Rutas",JSON.stringify(BASE_JSON) );	  
 					});	
-							  
 				});		  
 			});
 			
@@ -91,12 +89,17 @@
 		</script>
     </head>
     <body>
-    	
-        <div id="pop">
-        	Comenzando la sincronización de productos.
+    	<div data-role="header" data-theme="b">
+            <h1>Obten los datos del servidor</h1>
+        </div><!-- /header -->
+        <div>
+            <div id="pop">
+               <h2> Comenzando la sincronización de productos.</h2>
+            </div>
+            <p><a onclick="location.reload()" class="ui-btn ui-shadow ui-corner-all ui-btn-a">Recargar datos</a></p>
+            <script>
+                //$("#pop").popup({"shadow":true,"theme":"a","corners":true,"overlayTheme": "b"});
+            </script>
         </div>
-        <script>
-			//$("#pop").popup({"shadow":true,"theme":"a","corners":true,"overlayTheme": "b"});
-		</script>
     </body>
 </html>

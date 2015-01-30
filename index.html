@@ -147,10 +147,7 @@
                     </th>
                     <th data-priority="2">
                     	Precio
-                    </th>
-                    <th data-priority="3">
-                    	Costo
-                    </th>
+                    </th>                   
                     <th data-priority="4">
                     	Impuesto
                     </th>
@@ -177,8 +174,7 @@
 			$.each(myJSONObject['productos'],function(i,elem){
 				htmlTxt +="<tr>";
 				htmlTxt += "<td>"+elem['nombre']+"</td>";
-				htmlTxt += "<td>"+elem['precio']+"</td>";
-				htmlTxt += "<td>"+elem['costo']+"</td>";
+				htmlTxt += "<td>"+elem['precio']+"</td>";				
 				htmlTxt += "<td>"+elem['impuesto']+"</td>";				
 				htmlTxt += "</tr>";				
 			});
